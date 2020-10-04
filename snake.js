@@ -11,11 +11,14 @@ function Snake() {
 
   this.createSnake = function() {
     ctx.beginPath();
-    ctx.fillStyle = "#FF0000";
-    ctx.rect(20, 20, 15, 15);
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(20, 20, 15, 15);
     ctx.stroke()
     ctx.closePath();
   }
+
+  window.onresize = this.setCanvas;
+  window.onresize = this.createSnake;
 
   this.setCanvas();
   this.createSnake();
