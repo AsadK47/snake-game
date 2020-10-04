@@ -1,26 +1,37 @@
-function Snake() {
-  var canvas = document.getElementById("gameCanvas");
-  var ctx = canvas.getContext("2d");
-  var x = canvas.width / 2;
-  var y = canvas.height - 30;
+var canvas = document.getElementById("gameCanvas");
+var ctx = canvas.getContext("2d");
+var startX = canvas.width / 2;
+var startY = canvas.height - 30;
+var dx = 2;
+var dy = -2;
+var snakeWidth = 15;
+var snakeHeight = 15;
 
-  this.setCanvas = function() {
-    ctx.canvas.width = window.innerWidth;
-    ctx.canvas.height = window.innerHeight;
-  }
-
-  this.createSnake = function() {
-    ctx.beginPath();
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(20, 20, 15, 15);
-    ctx.stroke()
-    ctx.closePath();
-  }
-
-  window.onresize = this.setCanvas;
-  window.onresize = this.createSnake;
-
-  this.setCanvas();
-  this.createSnake();
+function setCanvas() {
+  ctx.canvas.width = window.innerWidth;
+  ctx.canvas.height = window.innerHeight;
 }
+
+setCanvas();
+
+function drawSnake() {
+  ctx.beginPath();
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(startX, startY, snakeWidth, snakeHeight);
+  ctx.fill()
+  ctx.closePath();
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawSnake();
+  startX += dx;
+  startY += dy;
+}
+
+setInterval(drawSnake, 10);
+
+window.onresize = this.setCanvas;
+window.onresize = this.drawSnake;
+
 
