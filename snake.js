@@ -1,50 +1,44 @@
 var canvas = document.getElementById("gameCanvas");
 var ctx = canvas.getContext("2d");
 var startX = canvas.width / 2;
-var startY = canvas.height - 30;
+var startY = canvas.height / 2;
 var xMovement = 1;
 var yMovement = 1;
 var snakeWidth = 15;
 var snakeHeight = 15;
-var millisecondRefreshRate = 0.1;
+var millisecondRefreshRate = 1;
 var rightPressed = false;
 var leftPressed = false;
 var upPressed = false;
 var downPressed = false;
 
 document.addEventListener("keydown", keyDownHandler, false);
-document.addEventListener("keyup", keyUpHandler, false);
 
 function keyDownHandler(e) {
   switch (e.keyCode) {
     case 37:
-      xMovement = -1;
+      leftPressed = true;
+      rightPressed = false;
+      upPressed = false;
+      downPressed = false;
       break;
     case 38:
-      yMovement = 1;
+      upPressed = true;
+      rightPressed = false;
+      leftPressed = false;
+      downPressed = false;
       break;
     case 39:
-      xMovement = 1;
+      rightPressed = true;
+      leftPressed = false;
+      upPressed = false;
+      downPressed = false;
       break;
     case 40:
-      yMovement - 1;
-      break;
-  }
-}
-
-function keyUpHandler(e) {
-  switch (e.keyCode) {
-    case 37:
-      xMovement = -1;
-      break;
-    case 38:
-      yMovement = 1;
-      break;
-    case 39:
-      xMovement = 1;
-      break;
-    case 40:
-      yMovement - 1;
+      downPressed = true;
+      rightPressed = false;
+      upPressed = false;
+      leftPressed = false;
       break;
   }
 }
@@ -67,14 +61,36 @@ function drawSnake() {
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawSnake();
+  barrierLogic();
+  move();
+}
 
+function barrierLogic() {
   if (startX + xMovement > canvas.width + snakeWidth) {
     startX = 0 - snakeWidth;
   } else if (startX - xMovement < 0 - snakeWidth) {
     startX = canvas.width + snakeWidth;
   }
 
-  startX += xMovement;
+  if (startY + yMovement > canvas.height + snakeHeight) {
+    startY = 0 - snakeHeight;
+  } else if (startY - yMovement < 0 - snakeHeight) {
+    startY = canvas.height + snakeHeight;
+  }
+}
+
+function move() {
+  if (upPressed) {
+    startY += -yMovement; 
+  } else if (downPressed) {
+    startY += yMovement;
+  } else if (rightPressed) {
+    startX += xMovement;
+  } else if (leftPressed) {
+    startX += -xMovement;
+  } else {
+    startX += xMovement;
+  }
 }
 
 setInterval(draw, millisecondRefreshRate);
