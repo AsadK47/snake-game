@@ -1,44 +1,41 @@
 var canvas = document.getElementById("gameCanvas");
 var ctx = canvas.getContext("2d");
-var startX = canvas.width / 2;
-var startY = canvas.height / 2;
-var xMovement = 1;
-var yMovement = 1;
-var snakeWidth = 15;
-var snakeHeight = 15;
+
+var snake = {xPos: (canvas.width / 2), yPos: (canvas.height / 2), 
+  width: 15, height: 15, xMovement: 1, yMovement: 1, colour: "#ffffff"};
+
+var food = {xPos: 200, yPos: 200, width: 6, height: 6, colour: "#ff0000"};
+
 var millisecondRefreshRate = 1;
-var rightPressed = false;
-var leftPressed = false;
-var upPressed = false;
-var downPressed = false;
+var directionPressedIs = {right: false, left: false, down: false, up: false};
 
 document.addEventListener("keydown", keyDownHandler, false);
 
 function keyDownHandler(e) {
   switch (e.keyCode) {
     case 37:
-      leftPressed = true;
-      rightPressed = false;
-      upPressed = false;
-      downPressed = false;
+      directionPressedIs.left = true;
+      directionPressedIs.right = false;
+      directionPressedIs.up = false;
+      directionPressedIs.down = false;
       break;
     case 38:
-      upPressed = true;
-      rightPressed = false;
-      leftPressed = false;
-      downPressed = false;
+      directionPressedIs.up = true;
+      directionPressedIs.right = false;
+      directionPressedIs.left = false;
+      directionPressedIs.down = false;
       break;
     case 39:
-      rightPressed = true;
-      leftPressed = false;
-      upPressed = false;
-      downPressed = false;
+      directionPressedIs.right = true;
+      directionPressedIs.left = false;
+      directionPressedIs.up= false;
+      directionPressedIs.down = false;
       break;
     case 40:
-      downPressed = true;
-      rightPressed = false;
-      upPressed = false;
-      leftPressed = false;
+      directionPressedIs.down = true;
+      directionPressedIs.right = false;
+      directionPressedIs.up= false;
+      directionPressedIs.left = false;
       break;
   }
 }
@@ -50,50 +47,60 @@ function setCanvas() {
 
 setCanvas();
 
-function drawSnake() {
+function drawRectObj(fillStyle, startXPos, startYPos, width, height) {
   ctx.beginPath();
-  ctx.fillStyle = "#ffffff";
-  ctx.fillRect(startX, startY, snakeWidth, snakeHeight);
+  ctx.fillStyle = fillStyle;
+  ctx.fillRect(startXPos, startYPos, width, height);
   ctx.fill();
   ctx.closePath();
 }
 
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawSnake();
+  drawRectObj(snake.colour, snake.xPos, snake.yPos, snake.width, snake.height);
+  drawRectObj(food.colour, food.xPos, food.yPos, food.width, food.height);
   barrierLogic();
+  // detectCollision();
   move();
 }
 
 function barrierLogic() {
-  if (startX + xMovement > canvas.width + snakeWidth) {
-    startX = 0 - snakeWidth;
-  } else if (startX - xMovement < 0 - snakeWidth) {
-    startX = canvas.width + snakeWidth;
+  if (snake.xPos + snake.xMovement > canvas.width + snake.width) {
+    snake.xPos = 0 - snake.width;
+  } else if (snake.xPos - snake.xMovement < 0 - snake.width) {
+    snake.xPos = canvas.width + snake.width;
   }
 
-  if (startY + yMovement > canvas.height + snakeHeight) {
-    startY = 0 - snakeHeight;
-  } else if (startY - yMovement < 0 - snakeHeight) {
-    startY = canvas.height + snakeHeight;
+  if (snake.yPos + snake.yMovement > canvas.height + snake.height) {
+    snake.yPos = 0 - snake.height;
+  } else if (snake.yPos - snake.yMovement < 0 - snake.height) {
+    snake.yPos = canvas.height + snake.height;
   }
 }
 
 function move() {
-  if (upPressed) {
-    startY += -yMovement; 
-  } else if (downPressed) {
-    startY += yMovement;
-  } else if (rightPressed) {
-    startX += xMovement;
-  } else if (leftPressed) {
-    startX += -xMovement;
+  if (directionPressedIs.up) {
+    snake.yPos += -snake.yMovement; 
+  } else if (directionPressedIs.down) {
+    snake.yPos += snake.yMovement;
+  } else if (directionPressedIs.right) {
+    snake.xPos += snake.xMovement;
+  } else if (directionPressedIs.left) {
+    snake.xPos += -snake.xMovement;
   } else {
-    startX += xMovement;
+    snake.xPos += snake.xMovement;
   }
+}
+
+// function detectCollision() {
+//   if ()
+// }
+
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
 }
 
 setInterval(draw, millisecondRefreshRate);
 
-window.onresize = this.setCanvas;
-window.onresize = this.drawSnake;
+window.onresize = setCanvas();
+window.onresize = draw();
