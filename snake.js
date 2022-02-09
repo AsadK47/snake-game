@@ -1,39 +1,55 @@
+// Grabs the canvas from the html document
 var canvas = document.getElementById("gameCanvas");
-var ctx = canvas.getContext("2d");
+// This method returns a drawing context on the canvas
+var context = canvas.getContext("2d");
 
-var snake = {xPos: (canvas.width / 2), yPos: (canvas.height / 2), 
-  width: 20, height: 20, xMovement: 1, yMovement: 1, colour: "#ffffff"};
+// Stores snakes head information
+// TODO: Style snake within CSS file
+var xPosition = canvas.width / 2;
+var yPosition = canvas.height / 2;
 
+var snakeHead = {xPos: xPosition, yPos: yPosition, 
+  width: 20, height: 20, xMovement: 1, yMovement: 1, colour: "#0BF83B"};
+
+var snakeBody = {xPos: xPosition, yPos: yPosition, 
+  width: 10, height: 10, xMovement: 1, yMovement: 1, colour: "#F2F80B"};
+
+// Stores food information
+// TODO: Style food within CSS file
 var food = {xPos: 200, yPos: 200, width: 6, height: 6, colour: "#ff0000"};
 
 var millisecondRefreshRate = 1;
 var direction = {right: false, left: false, down: false, up: false};
 var snakeArray = [];
-var counter = 1;
+var collisionCount = 1;
 var score = 0;
 
-document.addEventListener("keydown", keyDownHandler, false);
+document.addEventListener("keydown", keyHandler, false);
 
-function keyDownHandler(e) {
+function keyHandler(e) {
   switch (e.keyCode) {
+    // Left key
     case 37:
       direction.left = true;
       direction.right = false;
       direction.up = false;
       direction.down = false;
       break;
+    // Up key
     case 38:
       direction.up = true;
       direction.right = false;
       direction.left = false;
       direction.down = false;
       break;
+    // Right key
     case 39:
       direction.right = true;
       direction.left = false;
       direction.up= false;
       direction.down = false;
       break;
+    // Down key
     case 40:
       direction.down = true;
       direction.right = false;
@@ -44,25 +60,26 @@ function keyDownHandler(e) {
 }
 
 function setCanvas() {
-  ctx.canvas.width = window.innerWidth;
-  ctx.canvas.height = window.innerHeight;
+  context.canvas.width = window.innerWidth;
+  context.canvas.height = window.innerHeight;
 }
 
 setCanvas();
 
 function drawRectObj(fillStyle, startXPos, startYPos, width, height) {
-  ctx.beginPath();
-  ctx.fillStyle = fillStyle;
-  ctx.fillRect(startXPos, startYPos, width, height);
-  ctx.fill();
-  ctx.closePath();
+  context.beginPath();
+  context.fillStyle = fillStyle;
+  context.fillRect(startXPos, startYPos, width, height);
+  context.fill();
+  context.closePath();
 }
 
 function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawRectObj(snake.colour, snake.xPos, snake.yPos, snake.width, snake.height);
-  for (i = 0; i < counter; i++) {
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  drawRectObj(snakeHead.colour, snakeHead.xPos, snakeHead.yPos, snakeHead.width, snakeHead.height);
+  for (i = 0; i < collisionCount; i++) {
     drawRectObj(food.colour, food.xPos, food.yPos, food.width, food.height);
+    drawRectObj(snakeBody.colour, (snakeBody.xPos - 20), (snakeBody.yPos), snakeBody.width, snakeBody.height);
   }
   barrierLogic();
   detectCollision();
@@ -70,42 +87,60 @@ function draw() {
 }
 
 function barrierLogic() {
-  if (snake.xPos + snake.xMovement > canvas.width + snake.width) {
-    snake.xPos = 0 - snake.width;
-  } else if (snake.xPos - snake.xMovement < 0 - snake.width) {
-    snake.xPos = canvas.width + snake.width;
+  if (snakeHead.xPos + snakeHead.xMovement > canvas.width + snakeHead.width) {
+    snakeHead.xPos = 0 - snakeHead.width;
+  } else if (snakeHead.xPos - snakeHead.xMovement < 0 - snakeHead.width) {
+    snakeHead.xPos = canvas.width + snakeHead.width;
   }
 
-  if (snake.yPos + snake.yMovement > canvas.height + snake.height) {
-    snake.yPos = 0 - snake.height;
-  } else if (snake.yPos - snake.yMovement < 0 - snake.height) {
-    snake.yPos = canvas.height + snake.height;
+  if (snakeHead.yPos + snakeHead.yMovement > canvas.height + snakeHead.height) {
+    snakeHead.yPos = 0 - snakeHead.height;
+  } else if (snakeHead.yPos - snakeHead.yMovement < 0 - snakeHead.height) {
+    snakeHead.yPos = canvas.height + snakeHead.height;
+  }
+
+  if (snakeBody.xPos + snakeBody.xMovement > canvas.width + snakeBody.width) {
+    snakeBody.xPos = 0 - snakeBody.width;
+  } else if (snakeBody.xPos - snakeBody.xMovement < 0 - snakeBody.width) {
+    snakeBody.xPos = canvas.width + snakeBody.width;
+  }
+
+  if (snakeBody.yPos + snakeBody.yMovement > canvas.height + snakeBody.height) {
+    snakeBody.yPos = 0 - snakeBody.height;
+  } else if (snakeBody.yPos - snakeBody.yMovement < 0 - snakeBody.height) {
+    snakeBody.yPos = canvas.height + snakeBody.height;
   }
 }
 
 function move() {
   if (direction.up) {
-    snake.yPos += -snake.yMovement; 
+    snakeHead.yPos += -snakeHead.yMovement; 
+    snakeBody.yPos += -snakeHead.yMovement; 
   } else if (direction.down) {
-    snake.yPos += snake.yMovement;
+    snakeHead.yPos += snakeHead.yMovement;
+    snakeBody.yPos += snakeHead.yMovement
   } else if (direction.right) {
-    snake.xPos += snake.xMovement;
+    snakeHead.xPos += snakeHead.xMovement;
+    snakeBody.xPos += snakeHead.xMovement;
   } else if (direction.left) {
-    snake.xPos += -snake.xMovement;
+    snakeHead.xPos += -snakeHead.xMovement;
+    snakeBody.xPos += -snakeHead.xMovement;
   } else {
-    snake.xPos += snake.xMovement;
+    snakeHead.xPos += snakeHead.xMovement;
+    snakeBody.xPos += snakeHead.xMovement;
   }
 }
 
 function detectCollision() {
-  if (food.xPos < snake.xPos + snake.width 
-    && food.xPos + food.width > snake.xPos 
-    && food.yPos < snake.yPos + snake.height
-    && food.yPos + food.height > snake.yPos) {
+  if (food.xPos < snakeHead.xPos + snakeHead.width 
+    && food.xPos + food.width > snakeHead.xPos 
+    && food.yPos < snakeHead.yPos + snakeHead.height
+    && food.yPos + food.height > snakeHead.yPos) {
       food.xPos = getRandomInt(canvas.width);
       food.yPos = getRandomInt(canvas.height);
-      counter++;
+      collisionCount++;
       score++;
+      snakeArray.push(snakeHead);
     }
 }
 
